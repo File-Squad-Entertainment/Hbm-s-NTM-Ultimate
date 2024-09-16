@@ -1,19 +1,11 @@
 ## Changed
-* Changed the multi fluid ID recipe, they now use analog circuits instead of silicon based ones, no longer requiring plastic to make
-* Decreased the connection speed for all battery blocks, a full discharge now takes 30 seconds instead of 1 second, and charging now takes 10 seconds
-  * Capacitors have also been nerfed but they are twice as fast as battery blocks, 5 seconds for charging and 15 seconds for discharging
-* Removed forgotten bricks
-* Updated CMB brick texture
-* The ICF machine block now renders with its 3d model in the creative inventory
-* "Toggle backpack" keybind is now called "toggle jetpack" to reduce confusion
+* Pyrolysis recipes have been added
+  * Bedrock ores can be roasted at much higher speeds
+  * Pyrolysis ovens can now turn 4,000mB of coker gas into 500mB refgas
+  * Hydrogen + coal can be turned into heavy oil, heavy oil + coal turns into coalgas directly
+* The CCGT startup and shutdown sounds are now affected by mufflers
+* Armor battery packs now have recipes
 
 ## Fixed
-* Fixed pumpjack gauges not syncing properly
-* Fixed some concrete variants not being revertable into uncolored concrete
-* Fixed the ore density scanner not using proper translations for the HUD
-* Fixed the solar boiler's rays rendering on fast graphics instead of on fancy graphics
-* Fixed hydroreactive items not exploding when submerged in water
-* Fixed fluid valves visually disconnecting when switching state
-* Fixed fluid valves no visually connecting when type is set
-* Fixed falling blocks spawned by nukes or impulse grenades dropping blocks that don't have drops
-* Added even more exception handling to CompStacks, hopefully fixing an incompatibility with Mana Metal
+* Crash caused by new system gun init on servers
+* Fixed chemfac output slots not being marked as outputs, not granting achievements and allowing items to be inserted
