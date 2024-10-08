@@ -972,9 +972,10 @@ public class ModEventHandlerClient {
 		} else {
 			isRenderingItems = false;
 		}
+
+		EntityPlayer player = mc.thePlayer;
 		
 		if(event.phase == Phase.START) {
-			EntityPlayer player = mc.thePlayer;
 			
 			float discriminator = 0.003F;
 			float defaultStepSize = 0.5F;
@@ -990,6 +991,26 @@ public class ModEventHandlerClient {
 			} else {
 				for(int i = 1; i < 4; i++) if(player.stepHeight == i + discriminator) player.stepHeight = defaultStepSize;
 			}
+		}
+		
+		if(event.phase == Phase.END) {
+			
+			ItemGunBaseNT.offsetVertical += ItemGunBaseNT.recoilVertical;
+			ItemGunBaseNT.offsetHorizontal += ItemGunBaseNT.recoilHorizontal;
+			player.rotationPitch -= ItemGunBaseNT.recoilVertical;
+			player.rotationYaw -= ItemGunBaseNT.recoilHorizontal;
+
+			float decay = 0.75F;
+			float rebound = 0.25F;
+			ItemGunBaseNT.recoilVertical *= decay;
+			ItemGunBaseNT.recoilHorizontal *= decay;
+			float dV = ItemGunBaseNT.offsetVertical * rebound;
+			float dH = ItemGunBaseNT.offsetHorizontal * rebound;
+			
+			ItemGunBaseNT.offsetVertical -= dV;
+			ItemGunBaseNT.offsetHorizontal -= dH;
+			player.rotationPitch += dV;
+			player.rotationYaw += dH;
 		}
 	}
 	
@@ -1058,7 +1079,7 @@ public class ModEventHandlerClient {
 	}
 
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onMouseClicked(InputEvent.MouseInputEvent event) {
 		
 		Minecraft mc = Minecraft.getMinecraft();
@@ -1073,8 +1094,8 @@ public class ModEventHandlerClient {
 				if(key.getKeyCode() == keyCode && KeyBinding.hash.lookup(key.getKeyCode()) != key) {
 
 					key.pressed = state;
-					if(state) {
-						key.pressTime++;
+					if(state && key.pressTime == 0) {
+						key.pressTime = 1;
 					}
 				}
 			}
@@ -1101,7 +1122,7 @@ public class ModEventHandlerClient {
 	}
 
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onKeyTyped(InputEvent.KeyInputEvent event) {
 
 		Minecraft mc = Minecraft.getMinecraft();
@@ -1116,8 +1137,8 @@ public class ModEventHandlerClient {
 				if(keyCode != 0 && key.getKeyCode() == keyCode && KeyBinding.hash.lookup(key.getKeyCode()) != key) {
 					
 					key.pressed = state;
-					if(state) {
-						key.pressTime++;
+					if(state && key.pressTime == 0) {
+						key.pressTime = 1;
 					}
 				}
 			}

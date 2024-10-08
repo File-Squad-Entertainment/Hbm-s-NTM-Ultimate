@@ -1,11 +1,20 @@
 ## Changed
-* Pyrolysis recipes have been added
-  * Bedrock ores can be roasted at much higher speeds
-  * Pyrolysis ovens can now turn 4,000mB of coker gas into 500mB refgas
-  * Hydrogen + coal can be turned into heavy oil, heavy oil + coal turns into coalgas directly
-* The CCGT startup and shutdown sounds are now affected by mufflers
-* Armor battery packs now have recipes
+* Updated russian and chinese localization
+* The fine soot recipe in the pyrolysis oven now only needs 4 tar
+* Overdrive upgrades now use fullerite instead of lithium crystals
+* Machines now only send their sync packets once a second instead of once per tick if the values haven't changed, reducing network traffic by a considerable amount
+* Tom's explosion no longer causes any block updates on the millions of blocks it deletes which hopefully fixes a majority of the lag caused by the crater
+* Overdrive upgrades now increase power usage in pyrolysis ovens (equivalent to 2 speed upgrades per level)
+* Due to the increased maximum demand with overdrives + speed upgrades, the energy buffer for the pyrolysis oven has been increased tenfold
+* Updated basalt textures
+* Scaffold blocks can now be placed horizontally
+* Updated the shredder's textures
+* The strand caster will now cast its remaining buffer after 10 seconds of inactivity, even if the buffer is not full enough for a batch of 9
+* The soldering station now has a toggle for the "refuse to do recipes with no fluid if fluid is present" behavior
 
 ## Fixed
-* Crash caused by new system gun init on servers
-* Fixed chemfac output slots not being marked as outputs, not granting achievements and allowing items to be inserted
+* The conveyor grabber should no longer skip over items when used in long lines
+* Fixed a potential crash regarding crucibles
+* Fixed compatibility with EndlessIDs, biome changes should no longer crash the game
+* Fixed GL state leak caused by fluid tanks, causing some tile entities to be rendered without face culling
+* Fixed a bug where using too many PWR heatsinks would cause an overflow, making the heat capacity negative
