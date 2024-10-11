@@ -2,8 +2,6 @@ package com.hbm.items.weapon.sedna.factory;
 
 import java.util.function.BiConsumer;
 
-import com.hbm.handler.CasingEjector;
-import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.items.weapon.sedna.Receiver;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
@@ -22,21 +20,20 @@ public class Orchestras {
 	
 	public static BiConsumer<ItemStack, LambdaContext> DEBUG_ORCHESTRA = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		
 		if(type == AnimType.RELOAD) {
 			if(timer == 3) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverCock", 1F, 1F);
 			if(timer == 10) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallRemove", 1F, 1F);
 			if(timer == 34) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallInsert", 1F, 1F);
 			if(timer == 40) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverClose", 1F, 1F);
-			
-			if(timer == 20) {
+
+			if(timer == 16) {
 				Receiver rec = ctx.config.getReceivers(stack)[0];
 				IMagazine mag = rec.getMagazine(stack);
-				CasingEjector ejector = rec.getEjector(stack);
-				BulletConfig bullet = (BulletConfig) mag.getType(stack);
-				for(int i = 0; i < mag.getCapacity(stack); i++) ItemGunBaseNT.trySpawnCasing(player, ejector, bullet, stack);
+				SpentCasing casing = mag.getCasing(stack);
+				for(int i = 0; i < mag.getCapacity(stack); i++) CasingCreator.composeEffect(player.worldObj, player, 0.25, -0.125, -0.125, -0.05, 0, 0, 0.01, casing.getName());
 			}
 		}
 		if(type == AnimType.CYCLE) {
@@ -54,8 +51,8 @@ public class Orchestras {
 	
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_PEPPERBOX = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 
 		if(type == AnimType.RELOAD) {
 			if(timer == 24) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallInsert", 1F, 1F);
@@ -79,8 +76,8 @@ public class Orchestras {
 	
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_ATLAS = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 
 		if(type == AnimType.RELOAD) {
 			if(timer == 2) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallRemove", 1F, 1F);
@@ -104,10 +101,37 @@ public class Orchestras {
 		}
 	};
 	
+	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_DANI = (stack, ctx) -> {
+		EntityPlayer player = ctx.player;
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
+
+		if(type == AnimType.RELOAD) {
+			if(timer == 2) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallRemove", 1F, 1F);
+			if(timer == 36) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallInsert", 1F, 1F);
+			if(timer == 44) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverClose", 1F, 1F);
+		}
+		if(type == AnimType.CYCLE) {
+			if(timer == 9) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverCock", 1F, 0.9F);
+		}
+		if(type == AnimType.CYCLE_DRY) {
+			if(timer == 2) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.dryFireClick", 1F, 1F);
+			if(timer == 9) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverCock", 1F, 0.9F);
+		}
+		if(type == AnimType.INSPECT) {
+			if(timer == 2) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallRemove", 1F, 1F);
+			if(timer == 24) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverClose", 1F, 1F);
+		}
+		if(type == AnimType.JAMMED) {
+			if(timer == 12) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallRemove", 1F, 1F);
+			if(timer == 34) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverClose", 1F, 1F);
+		}
+	};
+	
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_HENRY = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == AnimType.RELOAD) {
@@ -142,8 +166,8 @@ public class Orchestras {
 	
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_GREASEGUN = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == AnimType.EQUIP) {
@@ -177,8 +201,8 @@ public class Orchestras {
 	
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_MARESLEG = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == AnimType.RELOAD) {
@@ -211,8 +235,8 @@ public class Orchestras {
 	
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_FLAREGUN = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 
 		if(type == AnimType.RELOAD) {
@@ -239,8 +263,8 @@ public class Orchestras {
 
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_NOPIP = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		
 		if(type == AnimType.RELOAD) {
 			if(timer == 3) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverCock", 1F, 1F);
@@ -270,8 +294,8 @@ public class Orchestras {
 
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_CARBIBE = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 		
 		if(type == AnimType.CYCLE) {
@@ -303,8 +327,8 @@ public class Orchestras {
 
 	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_AM180 = (stack, ctx) -> {
 		EntityPlayer player = ctx.player;
-		AnimType type = ItemGunBaseNT.getLastAnim(stack);
-		int timer = ItemGunBaseNT.getAnimTimer(stack);
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
 		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
 		
 		if(type == AnimType.CYCLE) {
@@ -319,6 +343,7 @@ public class Orchestras {
 		}
 		if(type == AnimType.RELOAD) {
 			if(timer == 2) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magRemove", 1F, 1F);
+			if(timer == 20) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.impact", 0.25F, 1F);
 			if(timer == 32) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magInsert", 1F, 1F);
 			if(timer == 40) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.pistolCock", 1F, 0.9F);
 		}
@@ -328,6 +353,70 @@ public class Orchestras {
 		if(type == AnimType.INSPECT) {
 			if(timer == 2) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magRemove", 1F, 1F);
 			if(timer == 35) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magInsert", 1F, 1F);
+		}
+	};
+	
+	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_LIBERATOR = (stack, ctx) -> {
+		EntityPlayer player = ctx.player;
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
+
+		if(type == AnimType.RELOAD) {
+			if(timer == 0) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverCock", 1F, 0.75F);
+			if(timer == 4) {
+				IMagazine mag = ctx.config.getReceivers(stack)[0].getMagazine(stack);
+				int toEject = mag.getAmountAfterReload(stack) - mag.getAmount(stack);
+				SpentCasing casing = mag.getCasing(stack);
+				for(int i = 0; i < toEject; i++) CasingCreator.composeEffect(player.worldObj, player, 0.625, -0.1875, -0.375D, -0.12, 0.18, 0, 0.01, casing.getName(), true, 60, 0.5D, 20);
+			}
+			if(timer == 15) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallInsert", 1F, 1F);
+		}
+		if(type == AnimType.RELOAD_CYCLE) {
+			if(timer == 5) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.magSmallInsert", 1F, 1F);
+		}
+		if(type == AnimType.RELOAD_END) {
+			if(timer == 2) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverClose", 1F, 0.9F);
+		}
+		if(type == AnimType.JAMMED) {
+			if(timer == 2) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverClose", 1F, 0.9F);
+			if(timer == 12) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverCock", 1F, 0.75F);
+			if(timer == 26) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverClose", 1F, 0.9F);
+		}
+		if(type == AnimType.CYCLE_DRY) {
+			if(timer == 0) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.dryFireClick", 1F, 1F);
+		}
+		if(type == AnimType.INSPECT) {
+			if(timer == 0) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverCock", 1F, 0.75F);
+			IMagazine mag = ctx.config.getReceivers(stack)[0].getMagazine(stack);
+			int toEject = mag.getAmountAfterReload(stack) - mag.getAmount(stack);
+			if(timer == 4 && toEject <= 0) {
+				SpentCasing casing = mag.getCasing(stack);
+				for(int i = 0; i < toEject; i++) CasingCreator.composeEffect(player.worldObj, player, 0.625, -0.1875, -0.375D, -0.12, 0.18, 0, 0.01, casing.getName(), true, 60, 0.5D, 20);
+				mag.setAmountAfterReload(stack, 0);
+			}
+			if(timer == 20) player.worldObj.playSoundAtEntity(player, "hbm:weapon.reload.revolverClose", 1F, 0.9F);
+		}
+	};
+	
+	public static BiConsumer<ItemStack, LambdaContext> ORCHESTRA_CONGOLAKE = (stack, ctx) -> {
+		EntityPlayer player = ctx.player;
+		AnimType type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+		int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
+		boolean aiming = ItemGunBaseNT.getIsAiming(stack);
+		
+		if(type == AnimType.CYCLE) {
+			if(timer == 15) {
+				IMagazine mag = ctx.config.getReceivers(stack)[0].getMagazine(stack);
+				SpentCasing casing = mag.getCasing(stack);
+				CasingCreator.composeEffect(player.worldObj, player, 0.625, aiming ? -0.0625 : -0.25, aiming ? 0 : -0.375D, 0, 0.18, 0.12, 0.01, casing.getName(), true, 60, 0.5D, 20);
+			}
+		}
+		if(type == AnimType.RELOAD || type == AnimType.RELOAD_CYCLE) {
+			if(timer == 0) player.worldObj.playSoundAtEntity(player, "hbm:weapon.glReload", 1F, 1F);
+		}
+		if(type == AnimType.INSPECT) {
+			if(timer == 9) player.worldObj.playSoundAtEntity(player, "hbm:weapon.glOpen", 1F, 1F);
+			if(timer == 27) player.worldObj.playSoundAtEntity(player, "hbm:weapon.glClose", 1F, 1F);
 		}
 	};
 }

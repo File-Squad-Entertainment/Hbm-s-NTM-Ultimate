@@ -109,6 +109,9 @@ public class BusAnimationKeyframe {
 		double change = value - previous.value;
 		double time = currentTime - startTime;
 
+		// Constant value optimisation
+		if(Math.abs(previous.value - value) < 0.000001) return value;
+
 		if(previous.interpolationType == IType.BEZIER) {
 			double v1x = startTime;
 			double v1y = previous.value;
@@ -119,6 +122,31 @@ public class BusAnimationKeyframe {
 			double v3y = leftY;
 			double v4x = startTime + duration;
 			double v4y = value;
+
+			// correct beziers into non-looping fcurves
+			double h1x = v1x - v2x;
+			double h1y = v1y - v2y;
+
+			double h2x = v4x - v3x;
+			double h2y = v4y - v3y;
+
+			double len = v4x - v1x;
+			double len1 = Math.abs(h1x);
+			double len2 = Math.abs(h2x);
+
+			if(len1 + len2 != 0) {
+				if(len1 > len) {
+					double fac = len / len1;
+					v2x = v1x - fac * h1x;
+					v2y = v1y - fac * h1y;
+				}
+
+				if(len2 > len) {
+					double fac = len / len2;
+					v3x = v4x - fac * h2x;
+					v3y = v4y - fac * h2y;
+				}
+			}
 
 			double curveT = findZero(currentTime, v1x, v2x, v3x, v4x);
 			return cubicBezier(v1y, v2y, v3y, v4y, curveT);
@@ -188,7 +216,13 @@ public class BusAnimationKeyframe {
 	}
 
 	private double sqrt3(double d) {
-		return Math.exp(Math.log(d) / 3.0);
+		if(d > 0.000001) {
+			return Math.exp(Math.log(d) / 3.0);
+		} else if(d > -0.000001) {
+			return 0;
+		} else {
+			return -Math.exp(Math.log(-d) / 3.0);
+		}
 	}
 
 	private double time(double start, double end, double duration) {
@@ -200,7 +234,7 @@ public class BusAnimationKeyframe {
 
 	// Blender bezier solvers, but rewritten (pain)
 	private double solveCubic(double c0, double c1, double c2, double c3) {
-		if(c3 != 0) {
+		if(c3 > 0.000001) {
 			double a = c2 / c3;
 			double b = c1 / c3;
 			double c = c0 / c3;
@@ -210,12 +244,10 @@ public class BusAnimationKeyframe {
 			double q = (2 * a * a * a - a * b + c) / 2;
 			double d = q * q + p * p * p;
 
-			if(d > 0) {
+			if(d > 0.000001) {
 				double t = Math.sqrt(d);
 				return sqrt3(-q + t) + sqrt3(-q - t) - a;
-			}
-
-			if(d == 0) {
+			} else if(d > -0.000001) {
 				double t = sqrt3(-q);
 				double result = 2 * t - a;
 				if(result < 0.000001 || result > 1.000001) {
@@ -242,29 +274,23 @@ public class BusAnimationKeyframe {
 		double b = c1;
 		double c = c0;
 
-		if(a != 0) {
+		if(a > 0.000001) {
 			double p = b * b - 4 * a * c;
 
-			if(p > 0) {
+			if(p > 0.000001) {
 				p = Math.sqrt(p);
 				double result = (-b - p) / (2 * a);
 				if(result < 0.000001 || result > 1.000001) {
 					result = (-b + p) / (2 * a);
 				}
 				return result;
-			}
-
-			if(p == 0) {
+			} else if(p > -0.000001) {
 				return -b / (2 * a);
 			}
 		}
 
-		if(b != 0) {
+		if(b > 0.000001) {
 			return -c / b;
-		}
-
-		if(c == 0) {
-			return 0;
 		}
 
 		return 0;
